@@ -103,14 +103,30 @@ class SudoSu
             return $this->usersCached;
         }
 
-        $user = $this->getUserModel();
+        $users = $this->getUserModel();
 
-        return $this->usersCached = $user->get();
+        if (is_array($users)) {
+            foreach ($users as $user) {
+                $this->usersCached .= $user;
+            }
+            return $this->usersCached;
+        } else {
+            return $this->usersCached = $users->get();
+        }
     }
 
     protected function getUserModel()
     {
-        $userModel = Config::get('sudosu.user_model');
-        return $this->app->make($userModel);
+        $userModels = Config::get('sudosu.user_model');
+
+        $models = [];
+        if (is_array($userModels)) {
+            foreach ($userModels as $model) {
+                $models[] = $this->app->make($model);
+            }
+        } else {
+            return $this->app->make($userModels);
+        }
+        return $models;
     }
 }
